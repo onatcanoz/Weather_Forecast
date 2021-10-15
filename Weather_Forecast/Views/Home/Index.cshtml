@@ -1,0 +1,142 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.25/js/dataTables.bootstrap.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.2.9/js/responsive.bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+            integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+            crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <div class="text-center">
+        <h1 class="display-4">WEATHER FORECAST</h1>
+        <br />
+        <br />
+        <div>
+            <ul class="display-4" style="list-style-type: none;">
+                <li>
+                    <button type="button" class="btn getForecastDataTable" data-toggle="modal"
+                            data-target="#getDataTableModal" value="Istanbul">
+                        ISTANBUL
+                    </button>
+                    @*<select name="days" id="days">
+                            <option value="default">--Select--</option>
+                            <option value="today">Today</option>
+                            <option value="tomorrow">Tomorrow</option>
+                        </select>*@
+                </li>
+                <li>
+                    <button type="button" class="btn getForecastDataTable" data-toggle="modal"
+                            data-target="#getDataTableModal" value="Ankara">
+                        ANKARA
+                    </button>
+                </li>
+                <li>
+                    <button type="button" class="btn getForecastDataTable" data-toggle="modal"
+                            data-target="#getDataTableModal" value="Izmir">
+                        IZMIR
+                    </button>
+                </li>
+                <li>
+                    <button type="button" class="btn getForecastDataTable" data-toggle="modal"
+                            data-target="#getDataTableModal" value="Madrid">
+                        MADRİD
+                    </button>
+                </li>
+                <li>
+                    <button type="button" class="btn getForecastDataTable" data-toggle="modal"
+                            data-target="#getDataTableModal" value="Paris">
+                        PARİS
+                    </button>
+                </li>
+            </ul>
+        </div>
+
+        <div class="modal" tabindex="-1" role="dialog" id="getDataTableModal">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">WEATHER FORECAST</h5>
+                        <button type="button" id="closebtn" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="container">
+                            <table id="forecastDatatable" class="table table-striped table-bordered ">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Weather State</th>
+                                        <th>Temparature</th>
+                                        <th>Wind Direction</th>
+                                        <th>Humudity</th>
+                                        <th>Air Pressure</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="forecastDatatableBody">
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+
+        var datatable;
+        $(document).ready(function () {
+            datatable = $('#forecastDatatable').DataTable()
+
+            $('#forecastDatatable').attr('style', 'width:750px');
+        });
+
+        $(".getForecastDataTable").click(function () {
+
+            let cityName = $(this).attr('value');
+            $.ajax({
+                type: "GET",
+                url: "/Home/GetData?cityName=" + cityName,
+                success: function (response) {
+                    response = JSON.parse(response)
+                    if (response != null) {
+                        datatable.clear().draw();
+                        for (let i = 0; i < response.length; i++) {
+                            datatable.row.add([
+                                response[i].applicable_date,
+                                response[i].weather_state_name,
+                                Math.round((response[i].the_temp) * 100) / 100  ,
+                                response[i].wind_direction_compass,
+                                response[i].humidity,
+                                response[i].air_pressure,
+                            ]).draw(false);
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
